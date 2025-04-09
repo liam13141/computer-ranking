@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ultimate PC Ranker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f0f0f;
+      color: #f0f0f0;
+      padding: 30px;
+    }
+    h1 {
+      color: #00ffaa;
+      font-size: 32px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background: #00ffaa;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .result {
+      margin-top: 30px;
+      font-size: 18px;
+      line-height: 1.7;
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #00ffaa50;
+    }
+    .score {
+      font-size: 26px;
+      color: #00ffcc;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .rank {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffdd00;
+      margin-bottom: 16px;
+    }
+    .category {
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Ultimate PC Ranker (Max Browser Info)</h1>
+  <p>This checks everything a browser can detect about your system and ranks your PC in detail!</p>
+  <button onclick="rankMyPC()">Analyze My PC</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    function rankMyPC() {
+      const cores = navigator.hardwareConcurrency || 2;
+      const ram = navigator.deviceMemory || 2;
+      const screenWidth = screen.width;
+      const screenHeight = screen.height;
+      const colorDepth = screen.colorDepth;
+      const resolution = screenWidth * screenHeight;
+      const platform = navigator.platform;
+      const language = navigator.language;
+      const userAgent = navigator.userAgent.toLowerCase();
+
+      // Browser and OS detection
+      let browser = "Unknown";
+      if (userAgent.includes("chrome")) browser = "Chrome";
+      else if (userAgent.includes("firefox")) browser = "Firefox";
+      else if (userAgent.includes("edg")) browser = "Edge";
+      else if (userAgent.includes("safari")) browser = "Safari";
+
+      let os = "Unknown";
+      if (userAgent.includes("windows")) os = "Windows";
+      else if (userAgent.includes("mac")) os = "macOS";
+      else if (userAgent.includes("linux")) os = "Linux";
+      else if (userAgent.includes("android")) os = "Android";
+      else if (userAgent.includes("iphone")) os = "iOS";
+
+      // GPU guessing (via user agent)
+      let gpuScore = 1;
+      let gpuName = "Unknown";
+      if (userAgent.includes("nvidia") || userAgent.includes("geforce")) {
+        gpuScore = 3.5;
+        gpuName = "NVIDIA (guess)";
+      } else if (userAgent.includes("amd") || userAgent.includes("radeon")) {
+        gpuScore = 3.0;
+        gpuName = "AMD Radeon (guess)";
+      } else if (userAgent.includes("intel")) {
+        gpuScore = 2.0;
+        gpuName = "Intel Integrated (guess)";
+      }
+
+      // Individual scores
+      const cpuScore = Math.min(cores, 24) * 2.5;     // Max: 60
+      const ramScore = Math.min(ram, 64) * 1.5;       // Max: 96
+      const gpuPower = gpuScore * 10;                // Max: 35
+      const resScore = resolution >= 2560 * 1440 ? 15 : resolution >= 1920 * 1080 ? 10 : 5;
+      const colorScore = colorDepth >= 24 ? 5 : 2;
+
+      const totalScore = Math.round(cpuScore + ramScore + gpuPower + resScore + colorScore);
+      const maxScore = 60 + 96 + 35 + 15 + 5; // 211
+
+      // Rank based on score
+      let rank = "🥔 Potato";
+      if (totalScore >= 180) rank = "🧠 Supercomputer";
+      else if (totalScore >= 160) rank = "🚀 God Tier";
+      else if (totalScore >= 140) rank = "🔥 Ultra High-End";
+      else if (totalScore >= 120) rank = "🛡️ High-End Gaming Rig";
+      else if (totalScore >= 100) rank = "💪 Solid Workhorse";
+      else if (totalScore >= 80)  rank = "🎮 Casual Gamer";
+      else if (totalScore >= 60)  rank = "🧊 Basic Machine";
+      else if (totalScore >= 40)  rank = "📚 School Chromebook";
+      else if (totalScore >= 25)  rank = "🐢 Snailbox";
+      else rank = "🥔 Potato";
+
+      // Output
+      document.getElementById("result").innerHTML = `
+        <div class="score">🧮 Total Score: ${totalScore} / ${maxScore}</div>
+        <div class="rank">🏆 Rank: ${rank}</div>
+
+        <div class="category">🧠 CPU Cores: ${cores} → ${cpuScore.toFixed(1)} pts</div>
+        <div class="category">🧬 RAM Detected: ${ram} GB → ${ramScore.toFixed(1)} pts</div>
+        <div class="category">🖥️ Screen: ${screenWidth}x${screenHeight} → ${resScore} pts</div>
+        <div class="category">🎨 Color Depth: ${colorDepth}-bit → ${colorScore} pts</div>
+        <div class="category">🧠 GPU Guess: ${gpuName} → ${gpuPower.toFixed(1)} pts</div>
+
+        <br><strong>🔧 System Info:</strong><br>
+        OS: ${os}<br>
+        Browser: ${browser}<br>
+        Platform: ${platform}<br>
+        Language: ${language}<br>
+        User Agent: ${navigator.userAgent}<br>
+      `;
+    }
+  </script>
+</body>
+</html>
